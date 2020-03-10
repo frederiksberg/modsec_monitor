@@ -30,7 +30,7 @@ class Requests(Base):
     vulns = db.orm.relationship(
         "Vulns",
         secondary=association_table,
-        backref="request"
+        backref="requests"
     )
 
 
@@ -46,6 +46,7 @@ engine.connect()
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
+
 def CommitRequest(req : Request) -> None:
     sess = Session()
     r = Requests(
@@ -57,19 +58,18 @@ def CommitRequest(req : Request) -> None:
         status = int(req.result)
     )
 
-    vs = set()
-
     for vuln in req.vulns:
-        v = Vulns(
-            id = vuln.id,
-            desc = vuln.desc
-        )
-        exists = sess.query(Vulns).filter_by(id=v.id).first()
-        if v.id not in vs:
-            r.vulns.append(v)
-            vs.add(v.id)
-            if not exists:
-                sess.add(v)
+        v = sess.query(Vulns).filter_by(id=vuln.id).first()
+
+        if not v:
+            v = Vulns(
+                id = vuln.id,
+                desc = vuln.desc
+            )
+
+            sess.add(v)
+
+        v.requests.append(r)
 
     sess.add(r)
     sess.commit()

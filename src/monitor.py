@@ -21,9 +21,12 @@ class ModsecEventHandler(PatternMatchingEventHandler):
             content = fd.read()
             fd.truncate(0)
 
+        print("Detected new change...")
+
         audit = MSP.Audit(content)
 
         for req in audit.reqs:
+            print("Committing new request...")
             CommitRequest(req)
         print("Requests committed!")
 
