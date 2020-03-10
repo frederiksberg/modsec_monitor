@@ -6,9 +6,9 @@ from watchdog.observers import Observer
 import MSP
 from db import CommitRequest
 
-LOG_DIR = "../test/"
-LOG_PATTERN = "*/test.log"
-LOG_FILE = "../test/test.log"
+LOG_DIR = "/var/log/"
+LOG_PATTERN = "*/modsec_audit.log"
+LOG_FILE = "/var/log/modsec_audit.log"
 
 class ModsecEventHandler(PatternMatchingEventHandler):
     patterns = [LOG_PATTERN]
