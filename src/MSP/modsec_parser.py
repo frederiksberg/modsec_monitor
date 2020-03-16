@@ -41,6 +41,7 @@ class Request:
         self.protocol = protocol
         self.ts = timestamp
         self.result = result
+        self.source_ip = None
         self.vulns = []
 
         if audit_file is not None:
@@ -51,8 +52,21 @@ class Request:
         try:
             with open(file, "r") as fd:
                 with mmap(fd.fileno(), 0, access=ACCESS_READ) as mm:
+                    h = mm.find(b"-A--")
+
+                    if h == -1:
+                        raise IOError("Invalid file format")
+
+                    mm.seek(h)
+
+                    mm.readline()
+                    a = mm.readline().decode("utf-8").replace("\n", "").split(" ")
+                    print(a)
+
+                    self.source_ip = a[3]
+
                     # Search for header using memory mapping
-                    h = mm.find(b"---H--")
+                    h = mm.find(b"-H--")
 
                     if h == -1:
                         raise IOError("Invalid file format")

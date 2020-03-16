@@ -26,6 +26,7 @@ class Requests(Base):
     protocol = db.Column(db.String(100), nullable=False)
     ts = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False)
+    source = db.Column(db.String(50), nullable=False)
 
     vulns = db.orm.relationship(
         "Vulns",
@@ -55,7 +56,8 @@ def CommitRequest(req : Request) -> None:
         method = req.method,
         protocol = req.protocol,
         ts = req.ts,
-        status = int(req.result)
+        status = int(req.result),
+        source = req.source_ip
     )
 
     for vuln in req.vulns:
