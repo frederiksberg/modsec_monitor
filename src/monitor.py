@@ -14,21 +14,25 @@ class ModsecEventHandler(PatternMatchingEventHandler):
     patterns = [LOG_PATTERN]
 
     def on_modified(self, event):
-        content = ""
-        with open(LOG_FILE, "r+") as fd:
-            if os.fstat(fd.fileno()).st_size == 0:
-                return
-            content = fd.read()
-            fd.truncate(0)
+        try:
+            content = ""
+            with open(LOG_FILE, "r+") as fd:
+                if os.fstat(fd.fileno()).st_size == 0:
+                    return
+                content = fd.read()
+                fd.truncate(0)
 
-        print("Detected new change...")
+            print("Detected new change...")
 
-        audit = MSP.Audit(content)
+            audit = MSP.Audit(content)
 
-        for req in audit.reqs:
-            print("Committing new request...")
-            CommitRequest(req)
-        print("Requests committed!")
+            for req in audit.reqs:
+                print("Committing new request...")
+                CommitRequest(req)
+            print("Requests committed!")
+        except:
+            # Make sure we crash all the way if something goes wrong in this thread
+            os._exit(1)
 
 
 if __name__ == "__main__":
